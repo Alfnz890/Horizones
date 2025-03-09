@@ -4,9 +4,18 @@ const prisma = new PrismaClient();
 
 export const PostModel = {
 
-   async getAllPosts(page = 1, limit = 10) {
+   async getAllPosts(page = 1, limit = 10, search = '') {
       const skip = (page - 1) * limit;
       const posts = await prisma.posts.findMany({
+         where: {
+            OR: [
+               {
+                  title: {
+                     contains: search
+                  }
+               }
+            ]
+         },
          skip: skip,
          take: limit,
          include: {
@@ -27,7 +36,17 @@ export const PostModel = {
             createdAt: 'desc'
          }
       });
-      const totalPosts = await prisma.posts.count();
+      const totalPosts = await prisma.posts.count({
+         where: {
+            OR: [
+               {
+                  title: {
+                     contains: search
+                  }
+               }
+            ]
+         }
+      });
       return {
          posts,
          totalPosts,

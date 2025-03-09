@@ -8,8 +8,9 @@ export const PostController = {
       try {
          const page = parseInt(req.query.page) || 1;
          const limit = parseInt(req.query.limit) || 10;
+         const search = req.query.search || "";
 
-         const posts = await PostModel.getAllPosts(page, limit);
+         const posts = await PostModel.getAllPosts(page, limit, search);
 
          return res.status(200).json({
             status: true,
