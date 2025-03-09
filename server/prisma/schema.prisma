@@ -1,0 +1,85 @@
+generator client {
+   provider = "prisma-client-js"
+}
+
+datasource db {
+   provider = "postgresql"
+   url      = env("DIRECT_URL")
+}
+
+model bookmarks {
+   id        Int      @id @default(autoincrement())
+   createdAt DateTime @default(now())
+   userId    Int
+   postId    Int
+   posts     posts    @relation(fields: [postId], references: [id])
+   users     users    @relation(fields: [userId], references: [id])
+}
+
+model categories {
+   id        Int      @id @default(autoincrement())
+   name      String
+   createdAt DateTime @default(now())
+   updatedAt DateTime
+   posts     posts[]
+}
+
+model comments {
+   id       Int    @id @default(autoincrement())
+   content  String
+   postId   Int
+   authorId Int
+   users    users  @relation(fields: [authorId], references: [id])
+   posts    posts  @relation(fields: [postId], references: [id])
+}
+
+model likes {
+   id        Int      @id @default(autoincrement())
+   createdAt DateTime @default(now())
+   userId    Int
+   postId    Int
+   posts     posts    @relation(fields: [postId], references: [id])
+   users     users    @relation(fields: [userId], references: [id])
+
+   @@unique([userId, postId])
+}
+
+model posts {
+   id         Int         @id @default(autoincrement())
+   title      String
+   slug       String      @unique
+   content    String
+   authorId   Int
+   createdAt  DateTime    @default(now())
+   updatedAt  DateTime
+   categoryId Int
+   image      String?
+   image_url  String?
+   bookmarks  bookmarks[]
+   comments   comments[]
+   likes      likes[]
+   users      users       @relation(fields: [authorId], references: [id])
+   categories categories  @relation(fields: [categoryId], references: [id])
+}
+
+model users {
+   id            Int         @id @default(autoincrement())
+   username      String
+   password      String
+   email         String      @unique
+   bio           String?
+   country       String?
+   gender        String?
+   website       String?
+   social_media1 String?
+   social_media2 String?
+   social_media3 String?
+   image         String?
+   image_url     String?
+   createdAt     DateTime    @default(now())
+   updatedAt     DateTime    @updatedAt
+   bookmarks     bookmarks[]
+   comments      comments[]
+   likes         likes[]
+   posts         posts[]
+}
